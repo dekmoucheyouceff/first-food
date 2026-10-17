@@ -1,0 +1,121 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Helper Primitives ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // --- Validation Helper: Restaurant ---
+    function isValidRestaurant(data) {
+      return data.name is string && data.name.size() >= 1 && data.name.size() <= 100 &&
+             data.category is string && data.category.size() <= 60 &&
+             data.city is string && data.city.size() <= 60 &&
+             data.doctorRating is number && data.doctorRating >= 0 && data.doctorRating <= 10 &&
+             data.doctorVerdict is string && data.doctorVerdict.size() <= 2000 &&
+             data.authorId is string && data.authorId.size() <= 128 &&
+             (!('address' in data) || (data.address is string && data.address.size() <= 200)) &&
+             (!('phone' in data) || (data.phone is string && data.phone.size() <= 50)) &&
+             (!('priceRange' in data) || (data.priceRange is string && data.priceRange.size() <= 10)) &&
+             (!('foodTasteRating' in data) || (data.foodTasteRating is number && data.foodTasteRating >= 0 && data.foodTasteRating <= 10)) &&
+             (!('cleanlinessRating' in data) || (data.cleanlinessRating is number && data.cleanlinessRating >= 0 && data.cleanlinessRating <= 10)) &&
+             (!('serviceRating' in data) || (data.serviceRating is number && data.serviceRating >= 0 && data.serviceRating <= 10)) &&
+             (!('valueRating' in data) || (data.valueRating is number && data.valueRating >= 0 && data.valueRating <= 10)) &&
+             (!('ambianceRating' in data) || (data.ambianceRating is number && data.ambianceRating >= 0 && data.ambianceRating <= 10)) &&
+             (!('recommendedDishes' in data) || (data.recommendedDishes is string && data.recommendedDishes.size() <= 500)) &&
+             (!('doctorNotes' in data) || (data.doctorNotes is string && data.doctorNotes.size() <= 1000)) &&
+             (!('isDoctorGoldChoice' in data) || data.isDoctorGoldChoice is bool);
+    }
+
+    // --- Validation Helper: FollowerReview ---
+    function isValidFollowerReview(data) {
+      return data.restaurantId is string && data.restaurantId.size() <= 128 &&
+             data.followerId is string && data.followerId.size() <= 128 &&
+             data.followerName is string && data.followerName.size() >= 1 && data.followerName.size() <= 60 &&
+             data.rating is number && data.rating >= 0 && data.rating <= 10 &&
+             data.comment is string && data.comment.size() >= 1 && data.comment.size() <= 2000 &&
+             (!('agreement' in data) || (data.agreement is string && data.agreement.size() <= 100)) &&
+             (!('dishOrdered' in data) || (data.dishOrdered is string && data.dishOrdered.size() <= 200)) &&
+             (!('helpfulCount' in data) || (data.helpfulCount is int && data.helpfulCount >= 0));
+    }
+
+    // --- Collections ---
+
+    // 1. Restaurants Collection
+    match /restaurants/{restaurantId} {
+      allow get, list: if isSignedIn();
+
+      allow create: if isSignedIn() &&
+                       isValidId(restaurantId) &&
+                       incoming().authorId == request.auth.uid &&
+                       incoming().createdAt is timestamp &&
+                       incoming().createdAt <= request.time &&
+                       isValidRestaurant(incoming());
+
+      allow update: if isSignedIn() &&
+                       isValidId(restaurantId) &&
+                       existing().authorId == request.auth.uid &&
+                       incoming().authorId == existing().authorId &&
+                       incoming().createdAt == existing().createdAt &&
+                       isValidRestaurant(incoming());
+
+      allow delete: if isSignedIn() &&
+                       isValidId(restaurantId) &&
+                       existing().authorId == request.auth.uid;
+
+      // 2. Follower Reviews Subcollection
+      match /reviews/{reviewId} {
+        allow get, list: if isSignedIn() && isValidId(restaurantId);
+
+        allow create: if isSignedIn() &&
+                         isValidId(restaurantId) &&
+                         isValidId(reviewId) &&
+                         incoming().followerId == request.auth.uid &&
+                         incoming().restaurantId == restaurantId &&
+                         incoming().createdAt is timestamp &&
+                         incoming().createdAt <= request.time &&
+                         isValidFollowerReview(incoming());
+
+        allow update: if isSignedIn() &&
+                         isValidId(restaurantId) &&
+                         isValidId(reviewId) &&
+                         (
+                           // Author updating their own review
+                           (existing().followerId == request.auth.uid &&
+                            incoming().followerId == existing().followerId &&
+                            incoming().restaurantId == existing().restaurantId &&
+                            incoming().createdAt == existing().createdAt &&
+                            isValidFollowerReview(incoming())) ||
+                           // Any authenticated user voting helpful
+                           (incoming().diff(existing()).affectedKeys().hasOnly(['helpfulCount']) &&
+                            incoming().helpfulCount is int &&
+                            incoming().helpfulCount >= 0)
+                         );
+
+        allow delete: if isSignedIn() &&
+                         isValidId(restaurantId) &&
+                         isValidId(reviewId) &&
+                         existing().followerId == request.auth.uid;
+      }
+    }
+  }
+}

@@ -1,0 +1,165 @@
+{
+  "entities": {
+    "Restaurant": {
+      "title": "Restaurant",
+      "description": "A restaurant reviewed by Tabib El Makla with comprehensive clinical dining criteria",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the restaurant"
+        },
+        "category": {
+          "type": "string",
+          "description": "Culinary category (grill, traditional, street food, burger, seafood, cafes)"
+        },
+        "city": {
+          "type": "string",
+          "description": "City where the restaurant is located"
+        },
+        "address": {
+          "type": "string",
+          "description": "Detailed street or neighborhood address"
+        },
+        "phone": {
+          "type": "string",
+          "description": "Contact phone number for reservations"
+        },
+        "priceRange": {
+          "type": "string",
+          "description": "Price level indicators $, $$, $$$"
+        },
+        "doctorRating": {
+          "type": "number",
+          "description": "Overall score evaluated by Tabib El Makla out of 10"
+        },
+        "foodTasteRating": {
+          "type": "number",
+          "description": "Taste and ingredients quality score out of 10"
+        },
+        "cleanlinessRating": {
+          "type": "number",
+          "description": "Cleanliness and kitchen hygiene score out of 10"
+        },
+        "serviceRating": {
+          "type": "number",
+          "description": "Staff hospitality and service speed score out of 10"
+        },
+        "valueRating": {
+          "type": "number",
+          "description": "Value for money score out of 10"
+        },
+        "ambianceRating": {
+          "type": "number",
+          "description": "Atmosphere and decor score out of 10"
+        },
+        "doctorVerdict": {
+          "type": "string",
+          "description": "Clinical diagnosis and food critique summary from the doctor"
+        },
+        "recommendedDishes": {
+          "type": "string",
+          "description": "Prescribed signature dishes recommended by the doctor"
+        },
+        "doctorNotes": {
+          "type": "string",
+          "description": "Doctor tips, peak crowd warnings, or reservation advice"
+        },
+        "isDoctorGoldChoice": {
+          "type": "boolean",
+          "description": "True if awarded the Gold Prescription badge"
+        },
+        "authorId": {
+          "type": "string",
+          "description": "Firebase UID of the creator who posted the restaurant"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update"
+        }
+      },
+      "required": [
+        "name",
+        "category",
+        "city",
+        "doctorRating",
+        "doctorVerdict",
+        "authorId",
+        "createdAt"
+      ]
+    },
+    "FollowerReview": {
+      "title": "FollowerReview",
+      "description": "Community review and dining experience posted by a follower",
+      "type": "object",
+      "properties": {
+        "restaurantId": {
+          "type": "string",
+          "description": "Document ID of the restaurant being reviewed"
+        },
+        "followerId": {
+          "type": "string",
+          "description": "Firebase UID of the reviewing follower"
+        },
+        "followerName": {
+          "type": "string",
+          "description": "Public name or handle of the follower"
+        },
+        "rating": {
+          "type": "number",
+          "description": "Follower's dining score out of 10"
+        },
+        "agreement": {
+          "type": "string",
+          "description": "Whether follower agrees with Tabib El Makla diagnosis"
+        },
+        "dishOrdered": {
+          "type": "string",
+          "description": "The specific meal or dish tried by the follower"
+        },
+        "comment": {
+          "type": "string",
+          "description": "Detailed text feedback and honest experience"
+        },
+        "helpfulCount": {
+          "type": "integer",
+          "description": "Count of other community members who found this review helpful"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of creation"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of last update"
+        }
+      },
+      "required": [
+        "restaurantId",
+        "followerId",
+        "followerName",
+        "rating",
+        "comment",
+        "createdAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/restaurants/{restaurantId}": {
+      "schema": "Restaurant",
+      "description": "Collection of restaurants reviewed by Tabib El Makla"
+    },
+    "/restaurants/{restaurantId}/reviews/{reviewId}": {
+      "schema": "FollowerReview",
+      "description": "Subcollection of follower reviews for a specific restaurant"
+    }
+  }
+}

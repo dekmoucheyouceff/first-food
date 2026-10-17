@@ -1,0 +1,6 @@
+{
+  "name": "طبيب الماكلة",
+  "description": "تطبيق طبيب الماكلة الرسمي لتجربة وتقييم المطاعم ومشاركة تجارب وتقييمات المتابعين",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

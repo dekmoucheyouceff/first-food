@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="100dp"
+    android:height="100dp"
+    android:viewportWidth="500"
+    android:viewportHeight="500">
+
+    <!-- Yellow Background -->
+    <path
+        android:fillColor="#FFCC00"
+        android:pathData="M0,0h500v500h-500z" />
+
+    <!-- Left Dimple -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#000000"
+        android:strokeWidth="14"
+        android:strokeLineCap="round"
+        android:pathData="M 128,235 C 136,215 148,215 150,232" />
+
+    <!-- Right Dimple -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#000000"
+        android:strokeWidth="14"
+        android:strokeLineCap="round"
+        android:pathData="M 350,232 C 352,215 364,215 372,235" />
+
+    <!-- Main Smile (Mouth curve filled with Black) -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M 130,232 C 160,250 210,275 250,275 C 290,275 340,250 370,232 C 325,295 175,295 130,232 Z" />
+
+    <!-- Tongue Sticking Out (Filled Black) -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M 285,260 C 285,240 305,210 325,215 C 338,218 340,235 330,252 C 315,260 295,263 285,260 Z" />
+
+    <!-- Tongue Crease / Highlight (Yellow) -->
+    <path
+        android:fillColor="#00000000"
+        android:strokeColor="#FFCC00"
+        android:strokeWidth="8"
+        android:strokeLineCap="round"
+        android:pathData="M 300,255 C 305,240 315,230 322,235 C 326,238 322,248 310,255" />
+
+</vector>
